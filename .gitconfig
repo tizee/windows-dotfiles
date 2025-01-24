@@ -1,0 +1,181 @@
+[init]
+  defaultBranch=master # Yes, the old-school
+
+[user]
+  name = tizee
+  email = 33030965+tizee@users.noreply.github.com
+  signingkey = 92180C1B273A7726
+[gpg]
+  program = 'f:\\GnuPG\\bin\\gpg.exe'
+
+[commit]
+  gpgsign=true
+
+[init]
+  # github compatible
+  defaultBranch=main
+[gc]
+  # http://git-scm.com/docs/git-reflog#Documentation/git-reflog.txt---expire-unreachablelttimegt
+  # by default 30 days
+  reflogExpireUnreachable=never
+  # by default 90 days
+  reflogExpire=never
+  # we should use git reflog expire --expire=<time> to specify the time manually
+ 
+[core]
+  editor=nvim
+  pager=delta  # git-delta
+  quotePath=false # utf-8 characters
+  autocrlf=true # enforce windows use Linux breaks
+  # Ensure that unicode filenames aren't mangled by HFS
+  precomposeUnicode=true
+  # prevent problems from changing case of a file
+  ignorecase=false
+
+# hint message for rare actions
+[advice]
+  addIngoredFile = false
+
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+
+[alias]
+  ce = config --edit
+  cge = config --global --edit
+  st = status
+  cm = commit -m
+  br = branch
+  co = checkout
+  addp =  add -p
+  cop = checkout -p
+  df = diff
+  dft = difftool
+  ci = commit
+  ls=ls-tree --full-tree --name-only -r HEAD
+  rv= remote -v
+  cp = cherry-pick
+  fc = fetch
+  last = log -1 HEAD --stat
+  logr = log --reverse
+  logrh = log --reverse --pretty=%H
+  logs= log -S
+  logg = log -G
+  logauthor= log --author
+  logsince= log --since
+  loguntil= log --until
+  logh = log --pretty=%H
+  hhh=!$(echo hello)
+  forcesafe=push --force-with-lease
+  fzff = !git ls-files --modified --others --exclude-standard | fzf -m --prompt 'ls-files> '
+  fzfvi = !nvim $(git ls-files --modified --others --exclude-standard | fzf -m --prompt 'nvim> ')
+  fzft = !git tag --list | fzf -m --prompt 'tag > '
+  fzfa = !git ls-files --modified --others --exclude-standard | fzf -m | xargs -I {} git add "{}"
+  # select unstaged file to restore
+  fzfr = !git restore $(git ls-files --modified --others --exclude-standard | fzf -m)
+  fzfstagedr = !git diff --name-only --cached | fzf -m --prompt 'path> ' --print0 | xargs -0 -I {} git restore --staged {}
+  fzfd = !git diff $(git ls-files --modified --others --exclude-standard | fzf -m)
+  # select unstaged file to diff
+  fzfdiff=!git difftool -t vimdiff -y $(git ls-files --modified | fzf -m)
+  fzfs = !git show $(git log --pretty=oneline | cut -c1-7 | fzf -m)
+  fzfco = !git checkout $(git branch | fzf )
+  fzfm = !git merge $(git branch | fzf )
+  visual = !gitk
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an> %ae %Creset' --abbrev-commit --date=relative
+  lg-ascii = log --graph --pretty=format:'%h -%d %s (%cr) <%an>' --abbrev-commit
+  lgg= log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %n%C(bold blue)<%an> %ae%Creset [%G?]%n' --abbrev-commit --date=relative --stat
+  adog = log --all --decorate --oneline --graph --date=relative --stat
+  adogs = log --all --decorate --oneline --graph --date=relative --stat --show-signature
+  adogr= log --all --decorate --oneline --reverse --date=relative --stat
+  adogrs = log --all --decorate --oneline --graph --date=relative --stat --show-signature
+  # pull rebase remote main by default
+  sync= "!f(){git pull origin ${1-main} --rebase}; f"
+  unstage= reset HEAD --
+  undo= reset HEAD^
+  amend= commit --amend
+  apppend= commit --amend --no-edit
+  spco= sparse-checkout
+  ra = remote add
+  rrm = remote remove
+  summary = --no-pager shortlog  -sne
+
+[branch]
+  # always rebase for new branches
+  autosetupprebase=always
+[pull]
+  # make my life easier :)
+  rebase=true
+
+[submodule]
+  recurse= true
+[format]
+  pretty=%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %n%C(bold blue)<%an> %ae%Creset [%G?]%n
+
+[delta]
+  features = tizee decorations
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = yellow box
+
+[delta "tizee"]
+  navigate = true # n for next and N for previous
+  line-numbers = true
+  line-numbers-minus-style = "#444444"
+  line-numbers-zero-style = "#444444"
+  line-numbers-plus-style = "#444444"
+  line-numbers-left-format = "{nm:>4}┊"
+  line-numbers-right-format = "{np:>4}│"
+  line-numbers-left-style = blue
+  line-numbers-right-style = blue
+  side-by-side = true
+  diff-so-fancy = true # emulate diff-so-fancy
+  whitespace-error-style = 22 reverse
+
+[interactive]
+  diffFilter = delta --color-only # git-delta
+
+#  see https://github.com/renovatebot/renovate/issues/13440
+[uploadpack]
+  allowfilter = true
+
+[https]
+;proxy = socks5://127.0.0.1:7890
+;   vpn may cause ssl issues
+ sslVerify = false
+[http]
+;proxy = socks5://127.0.0.1:7890
+;   vpn may cause ssl issues
+ sslVerify = false
+
+# CVE-2022-24765
+; [safe]
+;   directory=
+
+
+[merge]
+  tool = vimdiff
+  conflictstyle = diff3
+
+[mergetool]
+  prompt = false
+  keepBackup = false
+
+[mergetool "vimdiff"]
+  cmd = nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+
+[difftool]
+  prompt = false
+
+[difftool "difftastic"]
+  cmd = difft "$LOCAL" "$REMOTE"
+
+[diff]
+  # tool = vimdiff
+  tool = difftastic
+  # Git>=2.17
+  colorMoved = default
