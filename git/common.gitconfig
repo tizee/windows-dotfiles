@@ -1,12 +1,9 @@
-[init]
-  defaultBranch=master # Yes, the old-school
-
 [user]
   name = tizee
   email = 33030965+tizee@users.noreply.github.com
   signingkey = 92180C1B273A7726
 [gpg]
-  program = 'f:\\GnuPG\\bin\\gpg.exe'
+  program = f:\\GnuPG\\bin\\gpg.exe
 
 [commit]
   gpgsign=true
@@ -31,6 +28,9 @@
   precomposeUnicode=true
   # prevent problems from changing case of a file
   ignorecase=false
+
+  sshCommand = 'C:\\Windows\\System32\\OpenSSH\\ssh.exe'
+  hooksPath = C:\\Users\\tizee\\.git-hooks\\hooks\\
 
 # hint message for rare actions
 [advice]
@@ -67,12 +67,11 @@
   logsince= log --since
   loguntil= log --until
   logh = log --pretty=%H
-  hhh=!$(echo hello)
   forcesafe=push --force-with-lease
   fzff = !git ls-files --modified --others --exclude-standard | fzf -m --prompt 'ls-files> '
   fzfvi = !nvim $(git ls-files --modified --others --exclude-standard | fzf -m --prompt 'nvim> ')
   fzft = !git tag --list | fzf -m --prompt 'tag > '
-  fzfa = !git ls-files --modified --others --exclude-standard | fzf -m | xargs -I {} git add "{}"
+  fzfa = !git ls-files --modified --others --exclude-standard | fzf -m --bind 'ctrl-a:toggle-all' | xargs -I {} git add "{}"
   # select unstaged file to restore
   fzfr = !git restore $(git ls-files --modified --others --exclude-standard | fzf -m)
   fzfstagedr = !git diff --name-only --cached | fzf -m --prompt 'path> ' --print0 | xargs -0 -I {} git restore --staged {}
