@@ -32,3 +32,15 @@ function ygsc($repo) {
 function ygc() {
 	git commit
 }
+
+function ygurl {
+    param(
+        [string]$remote_name = "origin"
+    )
+    $gitUrl = git config --get "remote.$remote_name.url"
+    if ($gitUrl -match '^[^@]*@([^:\/]*)([:\/])') {
+        $gitUrl = $gitUrl -replace "^[^@]*@([^:\/]*)([:\/])", "https://`$1/"
+    }
+    $gitUrl = $gitUrl -replace '\.git$'
+    echo $gitUrl
+}
