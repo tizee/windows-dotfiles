@@ -20,6 +20,7 @@ $env:CUDAToolkit_ROOT = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.
 # type is the equivalent cat in powershell
 Set-Alias -Name "cat" -Value "type"
 Set-Alias -Name "trash" -Value "Remove-ItemSafely"
+Set-Alias -Name "rm" -Value "Remove-ItemSafely"
 
 # alias for dotfiles
 function dotconf {

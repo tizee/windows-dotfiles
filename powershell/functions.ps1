@@ -9,6 +9,15 @@ function make-link {
         [Parameter(Mandatory)][string]$source,
         [Parameter(Mandatory)][string]$link
     )
+    # Expand relative source path to absolute path
+    if (-not [System.IO.Path]::IsPathRooted($source)) {
+        $source = Join-Path -Path (Get-Location).Path -ChildPath $source
+    }
+
+    # Expand relative link path to absolute path
+    if (-not [System.IO.Path]::IsPathRooted($link)) {
+        $link = Join-Path -Path (Get-Location).Path -ChildPath $link
+    }
     if (!(Test-Path $source)) {
         Write-Error "Source file does not exist."
         return
