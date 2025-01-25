@@ -1,0 +1,5 @@
+- model_id: doubao-1.5-pro
+  model_name: ep-20250124145455-7gdzz
+  api_base: "https://ark.cn-beijing.volces.com/api/v3"
+  can_stream: true
+  api_key_name: doubao
