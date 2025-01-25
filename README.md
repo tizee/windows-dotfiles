@@ -1,0 +1,3 @@
+# Windows Dotfiles
+- PowerShell
+- Scoop
