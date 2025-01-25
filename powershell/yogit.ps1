@@ -15,7 +15,7 @@ function __yogit_get_current_branch {
 
 # Function equivalent to ygpush alias in zsh
 function ygpush {
-    $currentBranch = get_current_branch
+    $currentBranch = __yogit_get_current_branch
     git push origin $currentBranch
 }
 
@@ -27,4 +27,8 @@ function ygpull {
 
 function ygsc($repo) {
 	git clone $repo --depth=1
+}
+
+function ygc() {
+	git commit
 }
