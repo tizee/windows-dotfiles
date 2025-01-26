@@ -16,6 +16,7 @@ $env:CUDAToolkit_ROOT = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.
 
 # profile
 $env:MyProfile="$Home\.config\powershell\profile.ps1"
+$env:EDITOR="nvim"
 
 # scoop proxy
 # $env:HTTPS_PROXY="http://127.0.0.1:7890"
@@ -64,6 +65,16 @@ Set-PSReadLineOption @PSReadLineOptions
 Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadLineKeyHandler -Key "ctrl+d" -Function ForwardDeleteLine
 Set-PSReadLineKeyHandler -Key "ctrl+l" -Function DeleteLine
+Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+Set-PSReadLineKeyHandler -Key Alt+j -BriefDescription AccestSuggestionAndExecute -LongDescription "Accept and execute the current suggestion" -ScriptBlock { 
+    [PSConsoleReadLine]::AcceptSuggestion(); 
+    [PSConsoleReadLine]::AcceptLine() 
+}
+Set-PSReadLineKeyHandler -Key Ctrl+UpArrow -BriefDescription GoBack -LongDescription "Go back one directory" -ScriptBlock { 
+    Set-Location -
+    [PSConsoleReadLine]::AcceptLine()
+}
 
 # Vi mode
 function OnViModeChange {
