@@ -160,11 +160,11 @@ $pluginBaseDir = "$env:USERPROFILE\.config\powershell"
 
 # List of plugin scripts to load
 $plugins = @(
-    "conda.ps1",
     "llm.ps1",
     "yogit.ps1",
     "whisper.ps1",
     "ffmpeg.ps1",
+    "conda.ps1",
     "posh-git.ps1",
     "functions.ps1"
 )

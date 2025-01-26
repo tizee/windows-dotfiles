@@ -1,3 +1,4 @@
+# generate lyrics/subtitles using whisper
 function whis($lang, $file, $output) {
 	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
         if ($absolutePath) {
@@ -13,6 +14,7 @@ function whis($lang, $file, $output) {
 	    }
 }
 
+# generate lyrics/subtitles using whisperx
 function whisx($lang, $file, $output_dir) {
 	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
         if ($absolutePath) {
@@ -29,6 +31,7 @@ function whisx($lang, $file, $output_dir) {
 	    }
 }
 
+# extract audio file and convert to format supported by whisper models
 function gen_whisper_wav($file, $output) {
 	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
         if ($absolutePath) {
@@ -43,3 +46,4 @@ function gen_whisper_wav($file, $output) {
 		return
 	    }
 }
+

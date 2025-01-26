@@ -1,4 +1,6 @@
+changeps1: false
 auto_activate_base: true
+env_prompt: '({default_env}) '
 
 channels:
   - defaults
