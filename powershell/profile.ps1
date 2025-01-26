@@ -11,7 +11,7 @@ if ($env:Path -notmatch ([regex]::Escape("$env:USERPROFILE\.local\bin"))) {
     $env:Path += ";$env:USERPROFILE\.local\bin"
 }
 # whisper
-$env:Path += ";E:\AI-models\whisper"
+$env:Path += ";E:\AI-models\whisper;"
 $env:CUDAToolkit_ROOT = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5"
 
 # profile
