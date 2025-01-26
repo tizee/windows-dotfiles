@@ -68,12 +68,18 @@ Set-PSReadLineKeyHandler -Key "ctrl+l" -Function DeleteLine
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Alt+j -BriefDescription AccestSuggestionAndExecute -LongDescription "Accept and execute the current suggestion" -ScriptBlock { 
-    [PSConsoleReadLine]::AcceptSuggestion(); 
-    [PSConsoleReadLine]::AcceptLine() 
+    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptSuggestion(); 
+    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine() 
 }
 Set-PSReadLineKeyHandler -Key Ctrl+UpArrow -BriefDescription GoBack -LongDescription "Go back one directory" -ScriptBlock { 
-    Set-Location -
-    [PSConsoleReadLine]::AcceptLine()
+    $currentLocation = Get-Location
+
+    if ($currentLocation.Path -ne $currentLocation.Drive.Root) {
+        Set-Location ..
+    } else {
+        Write-Host "Already at the root directory of the drive." -ForegroundColor Yellow
+    }
+    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 }
 
 # Vi mode
