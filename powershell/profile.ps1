@@ -153,6 +153,10 @@ function Add-EnvironmentVariable {
 # ollama
 Add-EnvironmentVariable -VariableName "OLLAMA_HOST" -VariableValue "E:\Ollama" -Scope "User"
 Add-EnvironmentVariable -VariableName "OLLAMA_MODELS" -VariableValue "E:\Ollama_models" -Scope "User"
+# pnpm
+Add-EnvironmentVariable -VariableName "PNPM_HOME" -VariableValue "E:\pnpm" -Scope "User"
+# chocolatey
+Add-EnvironmentVariable -VariableName "ChocolateyInstall" -VariableValue "E:\chocolatey" -Scope "User"
 
 # plugins
 # Define the base directory for plugins
