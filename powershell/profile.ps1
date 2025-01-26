@@ -13,6 +13,10 @@ if ($env:Path -notmatch ([regex]::Escape("$env:USERPROFILE\.local\bin"))) {
 # whisper
 $env:Path += ";E:\AI-models\whisper"
 $env:CUDAToolkit_ROOT = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5"
+
+# profile
+$env:MyProfile="$Home\.config\powershell\profile.ps1"
+
 # scoop proxy
 # $env:HTTPS_PROXY="http://127.0.0.1:7890"
 # $env:HTTP_PROXY="http://127.0.0.1:7890"
@@ -133,24 +137,27 @@ function Add-EnvironmentVariable {
 Add-EnvironmentVariable -VariableName "OLLAMA_HOST" -VariableValue "E:\Ollama" -Scope "User"
 Add-EnvironmentVariable -VariableName "OLLAMA_MODELS" -VariableValue "E:\Ollama_models" -Scope "User"
 
-# conda
-$moduleLoadTime = Measure-Command {
-$Env:CONDA_EXE = "E:\Miniconda3\Scripts\conda.exe"
-$Env:_CE_M = $null
-$Env:_CE_CONDA = $null
-$Env:_CONDA_ROOT = "E:\Miniconda3"
-$Env:_CONDA_EXE = "E:\Miniconda3\Scripts\conda.exe"
-$CondaModuleArgs = @{ChangePs1 = $True}
-Import-Module "$Env:_CONDA_ROOT\shell\condabin\Conda.psm1" -ArgumentList $CondaModuleArgs
-# conda activate base
-Remove-Variable CondaModuleArgs
-}
-Write-Host "Time to init conda: $($moduleLoadTime.TotalMilliseconds)ms"
-
 # plugins
-. $env:USERPROFILE\.config\powershell\llm.ps1
-. $env:USERPROFILE\.config\powershell\yogit.ps1
-. $env:USERPROFILE\.config\powershell\whisper.ps1
-. $env:USERPROFILE\.config\powershell\ffmpeg.ps1
-. $env:USERPROFILE\.config\powershell\functions.ps1
+# Define the base directory for plugins
+$pluginBaseDir = "$env:USERPROFILE\.config\powershell"
 
+# List of plugin scripts to load
+$plugins = @(
+    "conda.ps1",
+    "llm.ps1",
+    "yogit.ps1",
+    "whisper.ps1",
+    "ffmpeg.ps1",
+    "posh-git.ps1",
+    "functions.ps1"
+)
+
+# Loop through the list and load each script if it exists
+foreach ($plugin in $plugins) {
+    $pluginPath = Join-Path -Path $pluginBaseDir -ChildPath $plugin
+    if (Test-Path -Path $pluginPath) {
+        . $pluginPath
+    } else {
+        Write-Warning "Plugin script not found: $pluginPath"
+    }
+}
