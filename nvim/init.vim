@@ -127,48 +127,18 @@ set magic
 " modeline
 set modeline
 
-" shada
-" The ShaDa file is used to store:
-" - The command line history.
-" - The search string history.
-" - The input-line history.
-" - Contents of non-empty registers.
-" - Marks for several files.
-" - File marks, pointing to locations in files.
-" - Last search/substitute pattern (for 'n' and '&').
-" - The buffer list.
-" - Global variables.
-if has('nvim') && ! has('win32') && ! has('win64')
-  set shada=!,'100,<50,s10,h
-  set shadafile=~/.config/nvim/tmp/nvim.shada
-  " create backup
-  silent !mkdir -p ~/.config/nvim/tmp/backup
-  " create undo
-  silent !mkdir -p ~/.config/nvim/tmp/undo
-  "silent !mkdir -p ~/.config/nvim/tmp/sessions
-  set backupdir=~/.config/nvim/tmp/backup,.
-  set directory=~/.config/nvim/tmp/backup,.
-endif
-
-
-" If sudo, disable vim swap/backup/undo/shada/viminfo writing
-if $SUDO_USER !=# '' && $USER !=# $SUDO_USER
-  \ && $HOME !=# expand('~'.$USER, 1)
-  \ && $HOME ==# expand('~'.$SUDO_USER, 1)
 
 " Backup and swap
 " Some servers have issues with backup files, see coc.vim/#649.
 " not createing swap file for new buffers
- set noswapfile
- set nowritebackup
- set nobackup
- set nowritebackup
- set noundofile
- if has('nvim')
+set nowritebackup
+set nobackup
+set nowritebackup
+set noundofile
+if has('nvim')
   set shada="NONE"
  else
   set viminfo="NONE"
- endif
 endif
 
 " disable swap file
@@ -200,9 +170,6 @@ if has('persistent_undo')
   set undolevels=10240
   if has('nvim')
     set undodir=~/.config/nvim/tmp/undo,.
-  else
-    silent !mkdir -p ~/.config/nvim/tmp/vim_undo
-    set undodir=~/.config/nvim/tmp/vim_undo,.
   endif
 endif
 
@@ -315,6 +282,4 @@ set mouse=nv
 set showtabline=2
 
 " }}}
-
-
 " }}}
