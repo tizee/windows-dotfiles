@@ -34,7 +34,7 @@ let g:python3_host_prog = 'C:\Python311\python.exe'
 " llm.vim
 let g:llm_config_path = expand('$HOME/.config/llm/llm.vim.yaml')
 let g:llm_system_prompt = ''
-let g:llm_model_name = 'deepkseek-chat' " 'doubao-1.5-pro'
+let g:llm_model_name = 'deepseek-chat' " 'doubao-1.5-pro'
 
 nnoremap <leader>t :NERDTreeToggle<CR>
 
@@ -169,7 +169,7 @@ if has('persistent_undo')
   set undofile
   set undolevels=10240
   if has('nvim')
-    set undodir=~/.config/nvim/tmp/undo,.
+    set undodir=~/.config/nvim/tmp/undo
   endif
 endif
 
