@@ -54,3 +54,26 @@ function touch($filename) {
 		 Set-Content $filename -Value $null -Force
 	}
 }
+
+function Reload-EnvVarUser {
+     # Define the registry path for user environment variables
+    $registryPath = 'HKCU:\Environment'
+
+    # Get the environment variables from the registry
+    $registryVariables = Get-ItemProperty -Path $registryPath
+
+    foreach ($registryVariable in $registryVariables.PSObject.Properties) {
+        $variableName = $registryVariable.Name
+        $registryValue = $registryVariable.Value
+
+        # Get the current value of the environment variable in the session
+        $currentValue = [Environment]::GetEnvironmentVariable($variableName, "User")
+
+        # Check if the value has changed
+        if ($currentValue -ne $registryValue) {
+            Write-Warning "update $variableName from $currentValue to $registryValue"
+            # Update the environment variable in the current session
+            [Environment]::SetEnvironmentVariable($variableName, $registryValue, "User")
+        }
+    }
+}
