@@ -1,171 +1,241 @@
 {
     "apps": [
         {
-            "Version": "24.09",
+            "Info": "",
             "Updated": "2025-01-24T23:59:46.5239129+08:00",
-            "Info": "",
             "Name": "7zip",
-            "Source": "main"
-        },
-        {
-            "Version": "1.37.0-1",
-            "Updated": "2025-01-24T23:57:06.2868276+08:00",
-            "Info": "",
-            "Name": "aria2",
-            "Source": "main"
-        },
-        {
-            "Version": "0.25.0",
-            "Updated": "2025-01-25T00:19:13.2982095+08:00",
-            "Info": "",
-            "Name": "bat",
-            "Source": "main"
-        },
-        {
-            "Version": "0.20.18",
-            "Updated": "2025-01-25T00:03:40.9686792+08:00",
-            "Info": "",
-            "Name": "eza",
-            "Source": "main"
-        },
-        {
-            "Version": "7.1",
-            "Updated": "2025-01-25T00:16:54.3974947+08:00",
-            "Info": "",
-            "Name": "ffmpeg",
-            "Source": "main"
-        },
-        {
-            "Version": "0.58.0",
-            "Updated": "2025-01-25T00:03:43.5425676+08:00",
-            "Info": "",
-            "Name": "fzf",
-            "Source": "main"
-        },
-        {
-            "Version": "2.47.1.2",
-            "Updated": "2025-01-25T00:00:01.5719576+08:00",
-            "Info": "",
-            "Name": "git",
-            "Source": "main"
-        },
-        {
-            "Version": "668",
-            "Updated": "2025-01-25T00:19:09.2368892+08:00",
-            "Info": "",
-            "Name": "less",
-            "Source": "main"
-        },
-        {
-            "Version": "0.10.3",
-            "Updated": "2025-01-25T00:00:19.3959477+08:00",
-            "Info": "",
-            "Name": "neovim",
-            "Source": "main"
-        },
-        {
-            "Version": "14.1.1",
-            "Updated": "2025-01-25T00:16:58.5292858+08:00",
-            "Info": "",
-            "Name": "ripgrep",
-            "Source": "main"
-        },
-        {
-            "Version": "0.2020.01.26",
-            "Updated": "2025-01-24T23:58:06.2662133+08:00",
-            "Info": "",
-            "Name": "sudo",
-            "Source": "main"
-        },
-        {
-            "Version": "12.1.2",
-            "Updated": "2025-01-25T00:03:55.2694137+08:00",
-            "Info": "",
-            "Name": "tokei",
-            "Source": "main"
-        },
-        {
             "Version": "24.09",
-            "Updated": "2025-01-24T23:59:46.5239129+08:00",
-            "Info": "Global install",
-            "Name": "7zip",
             "Source": "main"
         },
         {
-            "Version": "1.37.0-1",
+            "Info": "",
             "Updated": "2025-01-24T23:57:06.2868276+08:00",
-            "Info": "Global install",
             "Name": "aria2",
+            "Version": "1.37.0-1",
             "Source": "main"
         },
         {
-            "Version": "0.25.0",
+            "Info": "",
             "Updated": "2025-01-25T00:19:13.2982095+08:00",
-            "Info": "Global install",
             "Name": "bat",
+            "Version": "0.25.0",
             "Source": "main"
         },
         {
-            "Version": "0.20.18",
+            "Info": "",
             "Updated": "2025-01-25T00:03:40.9686792+08:00",
-            "Info": "Global install",
             "Name": "eza",
+            "Version": "0.20.18",
             "Source": "main"
         },
         {
-            "Version": "7.1",
+            "Info": "",
             "Updated": "2025-01-25T00:16:54.3974947+08:00",
-            "Info": "Global install",
             "Name": "ffmpeg",
+            "Version": "7.1",
             "Source": "main"
         },
         {
-            "Version": "0.58.0",
+            "Info": "",
             "Updated": "2025-01-25T00:03:43.5425676+08:00",
-            "Info": "Global install",
             "Name": "fzf",
+            "Version": "0.58.0",
             "Source": "main"
         },
         {
-            "Version": "2.47.1.2",
+            "Info": "",
+            "Updated": "2025-01-29T16:38:29.9067862+08:00",
+            "Name": "gawk",
+            "Version": "5.3.1",
+            "Source": "main"
+        },
+        {
+            "Info": "",
             "Updated": "2025-01-25T00:00:01.5719576+08:00",
-            "Info": "Global install",
             "Name": "git",
+            "Version": "2.47.1.2",
             "Source": "main"
         },
         {
-            "Version": "668",
+            "Info": "",
+            "Updated": "2025-01-27T20:10:24.1963377+08:00",
+            "Name": "JetBrainsMono-NF",
+            "Version": "3.3.0",
+            "Source": "nerd-fonts"
+        },
+        {
+            "Info": "",
             "Updated": "2025-01-25T00:19:09.2368892+08:00",
-            "Info": "Global install",
             "Name": "less",
+            "Version": "668",
             "Source": "main"
         },
         {
-            "Version": "0.10.3",
+            "Info": "",
+            "Updated": "2025-01-26T22:11:57.7250246+08:00",
+            "Name": "localsend",
+            "Version": "1.16.1",
+            "Source": "extras"
+        },
+        {
+            "Info": "",
             "Updated": "2025-01-25T00:00:19.3959477+08:00",
-            "Info": "Global install",
             "Name": "neovim",
+            "Version": "0.10.3",
             "Source": "main"
         },
         {
-            "Version": "14.1.1",
+            "Info": "",
+            "Updated": "2025-01-30T19:47:00.1483539+08:00",
+            "Name": "nginx",
+            "Version": "1.27.3",
+            "Source": "main"
+        },
+        {
+            "Info": "",
+            "Updated": "2025-01-29T23:34:15.362199+08:00",
+            "Name": "nodejs",
+            "Version": "23.6.1",
+            "Source": "main"
+        },
+        {
+            "Info": "",
             "Updated": "2025-01-25T00:16:58.5292858+08:00",
-            "Info": "Global install",
             "Name": "ripgrep",
+            "Version": "14.1.1",
             "Source": "main"
         },
         {
-            "Version": "0.2020.01.26",
+            "Info": "",
             "Updated": "2025-01-24T23:58:06.2662133+08:00",
-            "Info": "Global install",
             "Name": "sudo",
+            "Version": "0.2020.01.26",
             "Source": "main"
         },
         {
-            "Version": "12.1.2",
+            "Info": "",
             "Updated": "2025-01-25T00:03:55.2694137+08:00",
-            "Info": "Global install",
             "Name": "tokei",
+            "Version": "12.1.2",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-24T23:59:46.5239129+08:00",
+            "Name": "7zip",
+            "Version": "24.09",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-24T23:57:06.2868276+08:00",
+            "Name": "aria2",
+            "Version": "1.37.0-1",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:19:13.2982095+08:00",
+            "Name": "bat",
+            "Version": "0.25.0",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:03:40.9686792+08:00",
+            "Name": "eza",
+            "Version": "0.20.18",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:16:54.3974947+08:00",
+            "Name": "ffmpeg",
+            "Version": "7.1",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:03:43.5425676+08:00",
+            "Name": "fzf",
+            "Version": "0.58.0",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-29T16:38:29.9067862+08:00",
+            "Name": "gawk",
+            "Version": "5.3.1",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:00:01.5719576+08:00",
+            "Name": "git",
+            "Version": "2.47.1.2",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-27T20:10:24.1963377+08:00",
+            "Name": "JetBrainsMono-NF",
+            "Version": "3.3.0",
+            "Source": "nerd-fonts"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:19:09.2368892+08:00",
+            "Name": "less",
+            "Version": "668",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-26T22:11:57.7250246+08:00",
+            "Name": "localsend",
+            "Version": "1.16.1",
+            "Source": "extras"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:00:19.3959477+08:00",
+            "Name": "neovim",
+            "Version": "0.10.3",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-30T19:47:00.1483539+08:00",
+            "Name": "nginx",
+            "Version": "1.27.3",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-29T23:34:15.362199+08:00",
+            "Name": "nodejs",
+            "Version": "23.6.1",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:16:58.5292858+08:00",
+            "Name": "ripgrep",
+            "Version": "14.1.1",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-24T23:58:06.2662133+08:00",
+            "Name": "sudo",
+            "Version": "0.2020.01.26",
+            "Source": "main"
+        },
+        {
+            "Info": "Global install",
+            "Updated": "2025-01-25T00:03:55.2694137+08:00",
+            "Name": "tokei",
+            "Version": "12.1.2",
             "Source": "main"
         }
     ],
@@ -173,14 +243,14 @@
         {
             "Name": "main",
             "Source": "https://github.com/ScoopInstaller/Main",
-            "Updated": "2025-01-24T21:29:25+08:00",
+            "Updated": "2025-01-30T16:29:27+08:00",
             "Manifests": 1356
         },
         {
             "Name": "extras",
             "Source": "https://github.com/ScoopInstaller/Extras",
-            "Updated": "2025-01-24T20:33:54+08:00",
-            "Manifests": 2121
+            "Updated": "2025-01-30T16:31:56+08:00",
+            "Manifests": 2122
         },
         {
             "Name": "nerd-fonts",

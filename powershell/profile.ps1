@@ -162,6 +162,7 @@ $plugins = @(
     "posh-git.ps1",
     "cuda.ps1",
     "ollama.ps1",
+    "nginx.ps1",
     "functions.ps1"
     )
 
