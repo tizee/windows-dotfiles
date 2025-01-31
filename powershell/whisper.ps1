@@ -1,49 +1,67 @@
-# generate lyrics/subtitles using whisper
-function whis($lang, $file, $output) {
-	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
-        if ($absolutePath) {
-		$file = $absolutePath.Path
-		$output = Join-Path -Path (Get-Location) -ChildPath $output
-		Write-Host "wav file: $file"
-		Write-Host "srt file: $output"
-		whisper -l $lang -m E:\AI-models\whisper\models\ggml-large-v3.bin -f $file -osrt -of $output
-	    }
-	    else {
-		Write-Error "Invalid file path: $file"
-		return
-	    }
+$env:WHISPER_MODEL="E:\AI-models\whisper\models\ggml-large-v3.bin"
+# Generate lyrics/subtitles using Whisper
+function Generate-WhisperSubtitles {
+    param (
+        [string]$Language,
+        [string]$InputFile,
+        [string]$OutputFile
+    )
+
+    $absolutePath = Resolve-Path -Path $InputFile -ErrorAction SilentlyContinue
+    if ($absolutePath) {
+        $InputFile = $absolutePath.Path
+        $OutputFile = Join-Path -Path (Get-Location) -ChildPath $OutputFile
+        Write-Host "WAV file: $InputFile"
+        Write-Host "SRT file: $OutputFile"
+        whisper -l $Language -m $env:WHISPER_MODEL -f $InputFile -osrt -of $OutputFile
+    }
+    else {
+        Write-Error "Invalid file path: $InputFile"
+        return
+    }
 }
 
-# generate lyrics/subtitles using whisperx
-function whisx($lang, $file, $output_dir) {
-	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
-        if ($absolutePath) {
-		$file = $absolutePath.Path
-		$output = Join-Path -Path (Get-Location) -ChildPath $output
-		Write-Host "wav file: $file"
-		Write-Host "output dir: $output"
-		conda activate whisperx
-		whisperx --language $lang --output_format srt --output_dir $output_dir --compute_type float32 --highlight_words True --model large-v3 --model_dir E:\HuggingfaceCache --chunk_size 4 --device cuda $file
-	    }
-	    else {
-		Write-Error "Invalid file path: $file"
-		return
-	    }
+# Generate lyrics/subtitles using WhisperX
+function Generate-WhisperXSubtitles {
+    param (
+        [Parameter(Mandatory=$true, HelpMessage="The language of audio file(en, fr, de, es, it, ja, zh, nl, uk, pt)")]
+        [string]$Language,
+        [string]$InputFile,
+        [string]$OutputDirectory
+    )
+
+    $absolutePath = Resolve-Path -Path $InputFile -ErrorAction SilentlyContinue
+    if ($absolutePath) {
+        $InputFile = $absolutePath.Path
+        $OutputDirectory = Join-Path -Path (Get-Location) -ChildPath $OutputDirectory
+        Write-Host "WAV file: $InputFile"
+        Write-Host "Output directory: $OutputDirectory"
+        conda activate whisperx
+        whisperx --language $Language --output_format srt --output_dir $OutputDirectory --compute_type float32 --highlight_words True --model large-v3 --model_dir "E:\HuggingfaceCache" --chunk_size 4 --device cuda $InputFile
+    }
+    else {
+        Write-Error "Invalid file path: $InputFile"
+        return
+    }
 }
 
-# extract audio file and convert to format supported by whisper models
-function gen_whisper_wav($file, $output) {
-	$absolutePath = Resolve-Path $file -ErrorAction SilentlyContinue
-        if ($absolutePath) {
-		$file = $absolutePath.Path
-		$output = Join-Path -Path (Get-Location) -ChildPath $output
-		Write-Host "input file: $file"
-		Write-Host "wav file: $output.wav"
-		ffmpeg -hwaccel cuda -i $file -acodec pcm_s16le -ac 1 -ar 16000 "$output.wav"
-	    }
-	    else {
-		Write-Error "Invalid file path: $file"
-		return
-	    }
-}
+# Extract audio file and convert to format supported by Whisper models
+function ConvertTo-WhisperWav {
+    param (
+        [string]$InputFile,
+        [string]$OutputFile
+    )
 
+    $absolutePath = Resolve-Path -Path $InputFile -ErrorAction SilentlyContinue
+    if ($absolutePath) {
+        $InputFile = $absolutePath.Path
+        $OutputFile = Join-Path -Path (Get-Location) -ChildPath $OutputFile
+        Write-Host "Input file: $InputFile"
+        Write-Host "WAV file: $OutputFile.wav"
+        ffmpeg -hwaccel cuda -i $InputFile -acodec pcm_s16le -ac 1 -ar 16000 "$OutputFile.wav"
+    }
+    else {
+        Write-Error "Invalid file path: $InputFile"
+        return
+    }
+}
