@@ -3,3 +3,13 @@
   api_base: "https://ark.cn-beijing.volces.com/api/v3"
   can_stream: true
   api_key_name: doubao
+- model_id: siliconflow-r1
+  model_name: deepseek-ai/DeepSeek-R1
+  api_base: "https://api.siliconflow.cn/v1"
+  can_stream: true
+  api_key_name: siliconflow
+- model_id: siliconflow-v3
+  model_name: deepseek-ai/DeepSeek-V3
+  api_base: "https://api.siliconflow.cn/v1"
+  can_stream: true
+  api_key_name: siliconflow
