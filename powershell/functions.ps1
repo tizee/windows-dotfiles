@@ -77,3 +77,34 @@ function Reload-EnvVarUser {
         }
     }
 }
+
+function Find-Font {
+  param(
+    [string]$Name,
+    [string]$PartialName,
+    [switch]$CaseInsensitive,
+    [switch]$ListAll
+  )
+
+  if ($ListAll) {
+      [System.Drawing.FontFamily]::Families | ForEach-Object { $_.Name }
+      return
+  }
+
+
+  $fonts = [System.Drawing.FontFamily]::Families 
+
+  if ($Name) {
+      if ($CaseInsensitive) {
+         $fonts = $fonts | Where-Object {$_.Name -ceq $Name}
+      } else {
+         $fonts = $fonts | Where-Object {$_.Name -eq $Name}
+      }
+  }
+
+  if ($PartialName) {
+        $fonts = $fonts | Where-Object { $_.Name -like "*$PartialName*" }
+  }
+
+  $fonts | ForEach-Object { $_.Name }
+}

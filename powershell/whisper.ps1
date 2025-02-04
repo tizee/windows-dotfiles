@@ -1,4 +1,12 @@
 $env:WHISPER_MODEL="E:\AI-models\whisper\models\ggml-large-v3.bin"
+
+Add-EnvironmentVariable -VariableName "HF_HOME" -VariableValue "E:\HuggingfaceCache" -Scope "User"
+Add-EnvironmentVariable -VariableName "HF_ENDPOINT" -VariableValue "https://hf-mirror.com" -Scope "User"
+Add-EnvironmentVariable -VariableName "TORCH_HOME" -VariableValue "E:\TorchHome" -Scope "User"
+$env:HF_HOME="E:\HuggingfaceCache"
+$env:HF_ENDPOINT="https://hf-mirror.com"
+$env:TORCH_HOME="E:\TorchHome"
+
 # Generate lyrics/subtitles using Whisper
 function Generate-WhisperSubtitles {
     param (
@@ -37,7 +45,7 @@ function Generate-WhisperXSubtitles {
         Write-Host "WAV file: $InputFile"
         Write-Host "Output directory: $OutputDirectory"
         conda activate whisperx
-        whisperx --language $Language --output_format srt --output_dir $OutputDirectory --compute_type float32 --highlight_words True --model large-v3 --model_dir "E:\HuggingfaceCache" --chunk_size 4 --device cuda $InputFile
+        whisperx --language $Language --output_format srt --output_dir $OutputDirectory --compute_type float32 --highlight_words True --model large-v3 --model_dir $env:HF_HOME --chunk_size 4 --device cuda $InputFile
     }
     else {
         Write-Error "Invalid file path: $InputFile"
