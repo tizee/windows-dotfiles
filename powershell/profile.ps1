@@ -163,6 +163,7 @@ $plugins = @(
     "cuda.ps1",
     "ollama.ps1",
     "nginx.ps1",
+    "uv.ps1",
     "functions.ps1"
     )
 
