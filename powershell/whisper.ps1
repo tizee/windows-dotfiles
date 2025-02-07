@@ -1,10 +1,15 @@
 $env:WHISPER_MODEL="E:\AI-models\whisper\models\ggml-large-v3.bin"
 
+# huggingface
 Add-EnvironmentVariable -VariableName "HF_HOME" -VariableValue "E:\HuggingfaceCache" -Scope "User"
-Add-EnvironmentVariable -VariableName "HF_ENDPOINT" -VariableValue "https://hf-mirror.com" -Scope "User"
+Add-EnvironmentVariable -VariableName "HF_ENDPOINT" -VariableValue "https://huggingface.co" -Scope "User"
 Add-EnvironmentVariable -VariableName "TORCH_HOME" -VariableValue "E:\TorchHome" -Scope "User"
 $env:HF_HOME="E:\HuggingfaceCache"
-$env:HF_ENDPOINT="https://hf-mirror.com"
+# mirror https://hf-mirror.com
+# official https://huggingface.co
+$env:HF_ENDPOINT="https://huggingface.co"
+
+# pytorch
 $env:TORCH_HOME="E:\TorchHome"
 
 # Generate lyrics/subtitles using Whisper
