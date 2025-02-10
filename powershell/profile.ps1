@@ -164,6 +164,7 @@ $plugins = @(
     "ollama.ps1",
     "nginx.ps1",
     "uv.ps1",
+    "yt-dlp.ps1",
     "functions.ps1"
     )
 

@@ -1,65 +1,74 @@
-function Download-Ytb {
-  <#
-  .SYNOPSIS
-  Downloads YouTube videos in 1080p with best audio quality using yt-dlp.
-
-  .DESCRIPTION
-  This function checks if yt-dlp is installed, then downloads a YouTube video or playlist
-  in 1080p resolution with the best available audio quality.
-
-  .PARAMETER VideoUrl
-  The URL of the YouTube video or playlist.
-
-  .PARAMETER Playlist
-  A switch parameter indicating whether the URL is a playlist. If present, the entire playlist will be downloaded.
-
-  .EXAMPLE
-  Download-Ytb -VideoUrl "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  Downloads the single video with the specified URL.
-
-  .EXAMPLE
-  Download-Ytb -VideoUrl "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLE0hg-LdSfycrpTtMImPSqFLle4yYNzWD" -Playlist
-  Downloads the entire playlist with the specified URL.
-  #>
-  param (
-    [string]$VideoUrl,  # The URL of the YouTube video or playlist
-    [switch]$Playlist   # Flag to indicate if the URL is a playlist
-  )
-
-  # Check if yt-dlp is installed
-  if (Get-Command yt-dlp -ErrorAction SilentlyContinue) {
-    # Determine whether to include the playlist argument
-    $playlist_arg = if ($Playlist) { "--yes-playlist" } else { "" }
-
-    # Construct the yt-dlp command
-    $yt_dlp_command = "yt-dlp --no-mtime $playlist_arg --audio-format best --format `"bestvideo[height=1080]+bestaudio/best[height<=1080]/best`" --merge-output-format mp4 $VideoUrl"
-
-    # Execute the yt-dlp command
-    Invoke-Expression $yt_dlp_command
-  } else {
-    # Display an error message if yt-dlp is not installed
-    Write-Error "yt-dlp is not installed. Please install it before using this function."
-  }
-}
-
-function Fix-YouTubeVideo {
+function ConvertVideo {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
         [string]$file,
 
-        [Parameter(Mandatory=$true)]
-        [string]$output
+        [Parameter(Mandatory, HelpMessage = "Path to the output H.265(hevc)/H.264 video file.")]
+        [string]$output,
+
+        [ValidateSet("h264", "h265")]
+        [string]$format="h264",
+
+        [ValidateSet("ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow")]
+        [string]$quality = "medium"
     )
-    
+    $absolutePath = Resolve-Path $file -ErrorAction Stop
+    $file = $absolutePath.Path
+    Write-Host "Processing file: $file"
+    Write-Host "Output file: $output"
+
+    # Check if output file already exists
+    if (Test-Path $output) {
+        $overwrite = Read-Host "Output file '$output' already exists. Do you want to overwrite it? (Y/N)"
+        if ($overwrite -ne "Y") {
+            Write-Warning "Operation cancelled. File exists and overwrite denied."
+            return
+        }
+    }
+
+    # check CUDA
+    $cudaAvailable = $false
     try {
-        $absolutePath = Resolve-Path $file -ErrorAction Stop
-        $file = $absolutePath.Path
-        Write-Host "Processing file: $file"
-        Write-Host "Output file: $output"
-        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v h264_nvenc -preset medium $output
+        $cudaInfo = ffmpeg -hide_banner -hwaccels 2>&1
+        if ($cudaInfo -match "cuda") {
+            $cudaAvailable = $true
+        }
     } catch {
-        Write-Error "Invalid file path: $file"
+        Write-Warning "Failed to check CUDA availability. Falling back to software encoding."
+    }
+
+    $codec = ""
+    if ($cudaAvailable) {
+      $codec = "h264"
+      if ($format -match "h265")
+      {
+          $codec = "hevc"
+      }
+      $codec = $codec + "_nvenc"
+    } else {
+      $codec = "264"
+      if ($format -match "h265")
+      {
+          $codec = "265"
+      }
+      $codec = "libx" + $codec
+    }
+
+    if ($cudaAvailable) {
+        Write-Host "Using CUDA hardware acceleration."
+        # hardware encode
+        try {
+            ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v $codec -preset $quality $output
+        } catch {
+            Write-Warning "Hardware encoding failed. Falling back to software encoding."
+            # fallback to software encode
+            ffmpeg -i $file -c:v $codec -preset $quality $output
+        }
+    } else {
+        Write-Host "CUDA hardware acceleration not available. Using software encoding."
+        # software encode & transcode to h264 (for example, webm -> h264 mp4)
+        ffmpeg -i $file -c:v $codec -preset $quality $output
     }
 }
 
@@ -70,7 +79,10 @@ function Compress-Video {
         [string]$file,
 
         [Parameter(Mandatory=$true)]
-        [string]$output
+        [string]$output,
+
+        [ValidateSet("ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow")]
+        [string]$quality = "slow"
     )
     
     try {
@@ -78,64 +90,95 @@ function Compress-Video {
         $file = $absolutePath.Path
         Write-Host "Processing file: $file"
         Write-Host "Output file: $output"
-        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v h264_nvenc -movflags +faststart -preset slow -crf 22 -c:a copy $output
+        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v h264_nvenc -movflags +faststart -preset $quality -crf 22 -c:a copy $output
     } catch {
         Write-Error "Invalid file path: $file"
     }
 }
 
-function ConvertTo-H265Video {
+function RenderSubtitle {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
-        [string]$InputFileName,
+        [string]$file,
 
-        [Parameter(Mandatory, HelpMessage = "Path to the output H.265 video file.")]
-        [string]$OutputFileName,
+        [Parameter(Mandatory, HelpMessage = "Path to the source lang subtitle file")]
+        [string]$SRC_SRT = "src.srt",
 
-        [Parameter(HelpMessage = "Desired output frame rate. If not provided, the original frame rate is used.")]
-        [int]$Fps
+        [Parameter(Mandatory, HelpMessage = "Path to the translated lang subtitle file")]
+        [string]$TRANS_SRT = "trans.srt",
+
+        [Parameter(HelpMessage = "video width")]
+        [int]$TARGET_WIDTH = 1920,
+
+        [Parameter(HelpMessage = "video height")]
+        [int]$TARGET_HEIGHT = 1080,
+
+        [Parameter(Mandatory, HelpMessage = "Path to the output H.265(hevc)/H.264 video file.")]
+        [string]$output,
+
+        [ValidateSet("ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow")]
+        [string]$quality = "medium"
     )
+    $absolutePath = Resolve-Path $file -ErrorAction Stop
+    $file = $absolutePath.Path
+    Write-Host "Processing file: $file"
+    Write-Host "Output file: $output"
 
-    # Ensure absolute paths
-    if (-not (Test-Path $InputFileName)) {
-        Write-Error "Input file '$InputFileName' not found."
-        return
-    }
+    $SRC_FONT_COLOR = '&HFFFFFF'
+    $SRC_OUTLINE_COLOR = '&H000000'
+    $SRC_OUTLINE_WIDTH = 1
+    $SRC_SHADOW_COLOR = '&H80000000'
+    $TRANS_FONT_COLOR = '&H00FFFE'
+    $TRANS_OUTLINE_COLOR = '&H000000'
+    $TRANS_OUTLINE_WIDTH = 1 
+    $TRANS_BACK_COLOR = '&H33000000'
+    $TRANS_BORDER_STYLE = 1
 
-    $InputFullName = (Resolve-Path -Path $InputFileName -ErrorAction Stop).Path
+    $SRC_FONT_SIZE = 15
+    $TRANS_FONT_SIZE = 17
+    $FONT_NAME = 'Arial'
+    $TRANS_FONT_NAME = 'LXGW WenKai'
 
-    if (-not (Test-Path (Split-Path $OutputFileName -Parent))) {
-        Write-Error "The directory for the output file does not exist."
-        return
-    }
+$filterGraph = @"
+scale=${TARGET_WIDTH}:${TARGET_HEIGHT}:force_original_aspect_ratio=decrease,
+pad=${TARGET_WIDTH}:${TARGET_HEIGHT}:(ow-iw)/2:(oh-ih)/2,
+subtitles=${SRC_SRT}:force_style='FontSize=${SRC_FONT_SIZE},FontName=${FONT_NAME},PrimaryColour=${SRC_FONT_COLOR},OutlineColour=${SRC_OUTLINE_COLOR},OutlineWidth=${SRC_OUTLINE_WIDTH}, ShadowColour=${SRC_SHADOW_COLOR},BorderStyle=1',
+subtitles=${TRANS_SRT}:force_style='FontSize=${TRANS_FONT_SIZE},FontName=${TRANS_FONT_NAME}, PrimaryColour=${TRANS_FONT_COLOR},OutlineColour=${TRANS_OUTLINE_COLOR},OutlineWidth=${TRANS_OUTLINE_WIDTH}, BackColour=${TRANS_BACK_COLOR},Alignment=2,MarginV=27,ShadowColour=${SRC_SHADOW_COLOR},BorderStyle=${TRANS_BORDER_STYLE}'
+"@
+    Write-Host "filterGraph: $filterGraph"
+
 
     # Check if output file already exists
-    if (Test-Path $OutputFileName) {
-        $overwrite = Read-Host "Output file '$OutputFullName' already exists. Do you want to overwrite it? (Y/N)"
+    if (Test-Path $output) {
+        $overwrite = Read-Host "Output file '$output' already exists. Do you want to overwrite it? (Y/N)"
         if ($overwrite -ne "Y") {
             Write-Warning "Operation cancelled. File exists and overwrite denied."
             return
         }
     }
 
-    # Build FFmpeg command string
-
-
+    # check CUDA
+    $cudaAvailable = $false
     try {
-        # Run FFmpeg with the constructed command
-	if ($Fps) {
-	    & ffmpeg -i $InputFullName -vcodec hevc -map_metadata 0 -vf yadif -crf 20 -preset medium -r $Fps $OutputFileName
-	} else {
-	    & ffmpeg -i $InputFullName -vcodec hevc -map_metadata 0 -vf yadif -crf 20 -preset medium $OutputFileName
-	}
-
-        if ($?) {
-            Write-Output "Video compression to H.265 successful. Output saved as '$OutputFileName'."
-        } else {
-            Write-Error "FFmpeg operation failed. Check the command for errors."
+        $cudaInfo = ffmpeg -hide_banner -hwaccels 2>&1
+        if ($cudaInfo -match "cuda") {
+            $cudaAvailable = $true
         }
     } catch {
-        Write-Error "An unexpected error occurred: $_"
+        Write-Warning "Failed to check CUDA availability. Falling back to software encoding."
+    }
+
+    if ($cudaAvailable) {
+      try {
+          ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v h264_nvenc -vf "$filterGraph" -preset $quality $output
+        }
+        catch {
+            Write-Warning "Hardware encoding failed. Falling back to software encoding."
+          ffmpeg -i $file -c:v libx264 -vf "$filterGraph" -preset $quality $output
+          }
+    } else {
+          Write-Warning "Falling back to software encoding."
+          ffmpeg -i $file -c:v libx264 -vf "$filterGraph" -preset $quality $output
     }
 }
