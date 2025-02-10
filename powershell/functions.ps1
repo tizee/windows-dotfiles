@@ -108,3 +108,36 @@ function Find-Font {
 
   $fonts | ForEach-Object { $_.Name }
 }
+
+function Get-MachineId {
+    param (
+        [ValidateSet("GUID", "UUID", "BIOS", "Product", "ComputerName")]
+        [string]$Name = "GUID"
+    )
+
+    switch ($Name) {
+        "GUID" {
+            $machineGuid = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Cryptography').MachineGuid
+            Write-Output "Machine GUID: $machineGuid"
+        }
+        "UUID" {
+            $uuid = (Get-WmiObject -Class Win32_ComputerSystemProduct).UUID
+            Write-Output "Machine UUID: $uuid"
+        }
+        "BIOS" {
+            $biosSerial = (Get-WmiObject -Class Win32_BIOS).SerialNumber
+            Write-Output "BIOS Serial Number: $biosSerial"
+        }
+        "Product" {
+            $productId = (Get-WmiObject -Class SoftwareLicensingService).OA3xOriginalProductKey
+            Write-Output "Windows Product ID: $productId"
+        }
+        "ComputerName" {
+            $computerName = $env:COMPUTERNAME
+            Write-Output "Computer Name: $computerName"
+        }
+        default {
+            Write-Output "Invalid parameter value. Please choose from: GUID, UUID, BIOS, Product, ComputerName."
+        }
+    }
+}
