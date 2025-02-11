@@ -1,3 +1,112 @@
+function ExtractVideoAudio {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
+        [string]$file
+        [Parameter(Mandatory, HelpMessage = "Path to the output audio file.")]
+        [string]$output
+        )
+    $absolutePath = Resolve-Path $file -ErrorAction Stop
+    $file = $absolutePath.Path
+
+    ffmpeg -i $file -c:a aac -q:a 2 $output.m4a
+}
+
+function Ffmpeg-EncodersJson {
+    # Capture ffmpeg output (including stderr)
+    $ffmpegOutput = & ffmpeg -hide_banner -encoders 2>&1 | ForEach-Object {
+        if ($_ -is [System.Management.Automation.ErrorRecord]) {
+            $_.ToString()
+        } else {
+            $_
+        }
+    }
+
+    # Initialize encoder lists
+    $videoEncoders = [System.Collections.Generic.List[string]]::new()
+    $audioEncoders = [System.Collections.Generic.List[string]]::new()
+    $subtitleEncoders = [System.Collections.Generic.List[string]]::new()
+
+    $foundSeparator = $false
+
+    foreach ($line in $ffmpegOutput) {
+        $trimmedLine = $line.Trim()
+
+        if (-not $foundSeparator) {
+            if ($trimmedLine -match '^------') {
+                $foundSeparator = $true
+            }
+            continue
+        }
+
+        # Split line into components
+        $parts = $trimmedLine -split '\s+', 3
+        if ($parts.Count -lt 2) { continue }
+
+        $code = $parts[0]
+        $encoderName = $parts[1]
+
+        # Determine encoder type from first character of code
+        switch ($code[0]) {
+            'V' { $videoEncoders.Add($encoderName) }
+            'A' { $audioEncoders.Add($encoderName) }
+            'S' { $subtitleEncoders.Add($encoderName) }
+        }
+    }
+
+    # Create result object and convert to JSON
+    [PSCustomObject]@{
+        video_encoder    = $videoEncoders
+        audio_encoder    = $audioEncoders
+        subtitle_encoder = $subtitleEncoders
+    } | ConvertTo-Json
+}
+
+function GetVideoEncoderList {
+  Ffmpeg-EncodersJson | jq '.video_encoder'
+}
+
+function Ffmpeg-SearchEncoder {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
+        [string]$encoder,
+        [Parameter(HelpMessage = "search audio encoder")]
+        [bool]$audio=$false
+        )
+    if($audio)
+    {
+      GetAudioEncoderList | jq -r ".[] | select(contains(`"${encoder}`"))"
+    }else
+    {
+      GetVideoEncoderList | jq -r ".[] | select(contains(`"${encoder}`"))"
+    }
+}
+
+function GetAudioEncoderList {
+  Ffmpeg-EncodersJson | jq '.audio_encoder'
+}
+
+function GetVideoInfo {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
+        [string]$file
+        )
+    $absolutePath = Resolve-Path $file -ErrorAction Stop
+    $file = $absolutePath.Path
+    ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,codec_long_name,profile,codec_type,codec_tag_string,codec_tag,width,height,coded_width,coded_height,display_aspect_ratio -of json $file
+}
+
+function GetVideoCodec {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
+        [string]$file
+        )
+   GetVideoInfo $file | jq '.streams[] | {codec_name, codec_long_name, codec_tag_string}'
+}
+
 function ConvertVideo {
     [CmdletBinding()]
     param (
@@ -82,15 +191,15 @@ function Compress-Video {
         [string]$output,
 
         [ValidateSet("ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow")]
-        [string]$quality = "slow"
+        [string]$quality = "superfast"
     )
     
     try {
         $absolutePath = Resolve-Path $file -ErrorAction Stop
         $file = $absolutePath.Path
         Write-Host "Processing file: $file"
+        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -tag:v avc1 -c:v h264_nvenc -movflags +faststart -preset $quality -crf 30 -c:a copy $output
         Write-Host "Output file: $output"
-        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -c:v h264_nvenc -movflags +faststart -preset $quality -crf 22 -c:a copy $output
     } catch {
         Write-Error "Invalid file path: $file"
     }
@@ -125,6 +234,7 @@ function RenderSubtitle {
     Write-Host "Processing file: $file"
     Write-Host "Output file: $output"
 
+    # color format: BBGGRR
     $SRC_FONT_COLOR = '&HFFFFFF'
     $SRC_OUTLINE_COLOR = '&H000000'
     $SRC_OUTLINE_WIDTH = 1
@@ -144,7 +254,7 @@ $filterGraph = @"
 scale=${TARGET_WIDTH}:${TARGET_HEIGHT}:force_original_aspect_ratio=decrease,
 pad=${TARGET_WIDTH}:${TARGET_HEIGHT}:(ow-iw)/2:(oh-ih)/2,
 subtitles=${SRC_SRT}:force_style='FontSize=${SRC_FONT_SIZE},FontName=${FONT_NAME},PrimaryColour=${SRC_FONT_COLOR},OutlineColour=${SRC_OUTLINE_COLOR},OutlineWidth=${SRC_OUTLINE_WIDTH}, ShadowColour=${SRC_SHADOW_COLOR},BorderStyle=1',
-subtitles=${TRANS_SRT}:force_style='FontSize=${TRANS_FONT_SIZE},FontName=${TRANS_FONT_NAME}, PrimaryColour=${TRANS_FONT_COLOR},OutlineColour=${TRANS_OUTLINE_COLOR},OutlineWidth=${TRANS_OUTLINE_WIDTH}, BackColour=${TRANS_BACK_COLOR},Alignment=2,MarginV=27,ShadowColour=${SRC_SHADOW_COLOR},BorderStyle=${TRANS_BORDER_STYLE}'
+subtitles=${TRANS_SRT}:force_style='FontSize=${TRANS_FONT_SIZE},FontName=${TRANS_FONT_NAME}, PrimaryColour=${TRANS_FONT_COLOR},OutlineColour=${TRANS_OUTLINE_COLOR},OutlineWidth=${TRANS_OUTLINE_WIDTH},BackColour=${TRANS_BACK_COLOR},Alignment=2,MarginV=27,ShadowColour=${SRC_SHADOW_COLOR},BorderStyle=${TRANS_BORDER_STYLE}'
 "@
     Write-Host "filterGraph: $filterGraph"
 

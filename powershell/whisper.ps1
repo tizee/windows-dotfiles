@@ -3,7 +3,6 @@ $env:WHISPER_MODEL="E:\AI-models\whisper\models\ggml-large-v3.bin"
 # huggingface
 Add-EnvironmentVariable -VariableName "HF_HOME" -VariableValue "E:\HuggingfaceCache" -Scope "User"
 Add-EnvironmentVariable -VariableName "HF_ENDPOINT" -VariableValue "https://huggingface.co" -Scope "User"
-Add-EnvironmentVariable -VariableName "TORCH_HOME" -VariableValue "E:\TorchHome" -Scope "User"
 $env:HF_HOME="E:\HuggingfaceCache"
 $env:HF_HUB="E:\HuggingfaceCache\hub"
 # mirror https://hf-mirror.com
@@ -15,11 +14,13 @@ function HFMirror {
 
 # pytorch
 $env:TORCH_HOME="E:\TorchHome"
+Add-EnvironmentVariable -VariableName "TORCH_HOME" -VariableValue "E:\TorchHome" -Scope "User"
 
 # Generate lyrics/subtitles using Whisper
 function Generate-WhisperSubtitles {
     param (
-        [string]$Language,
+        [ValidateSet("en", "fr", "de", "es", "it", "ja", "zh", "nl", "uk", "pt")]
+        [string]$Language="en",
         [string]$InputFile,
         [string]$OutputFile
     )
@@ -67,7 +68,7 @@ function Generate-WhisperXSubtitles {
 }
 
 # Extract audio file and convert to format supported by Whisper models
-function ConvertTo-WhisperWav {
+function Extract-WhisperWav {
     param (
         [string]$InputFile,
         [string]$OutputFile
@@ -79,7 +80,7 @@ function ConvertTo-WhisperWav {
         $OutputFile = Join-Path -Path (Get-Location) -ChildPath $OutputFile
         Write-Host "Input file: $InputFile"
         Write-Host "WAV file: $OutputFile.wav"
-        ffmpeg -hwaccel cuda -i $InputFile -acodec pcm_s16le -ac 1 -ar 16000 "$OutputFile.wav"
+        ffmpeg -hwaccel cuda -i $InputFile -acodec pcm_s16le -ac 1 -ar 16000 -af aresample=async=1 "$OutputFile.wav"
     }
     else {
         Write-Error "Invalid file path: $InputFile"
