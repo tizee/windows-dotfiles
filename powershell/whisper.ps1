@@ -97,8 +97,8 @@ function Generate-SubtitlesFromVideo {
     )
 
     # Step 1: Convert the video file to a WAV file
-    $wavOutputFile = Join-Path -Path $OutputDirectory -ChildPath "audio"
-    ConvertTo-WhisperWav -InputFile $InputFile -OutputFile $wavOutputFile
+    $wavOutputFile = Join-Path -Path $OutputDirectory -ChildPath "$InputFile"
+    Extract-WhisperWav $InputFile -OutputFile $wavOutputFile
 
     # Step 2: Generate subtitles using WhisperX
     $wavFilePath = "$wavOutputFile.wav"
