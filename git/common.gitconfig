@@ -144,11 +144,11 @@
   allowfilter = true
 
 [https]
-;proxy = socks5://127.0.0.1:7890
+; proxy = socks5://127.0.0.1:10808
 ;   vpn may cause ssl issues
  sslVerify = false
 [http]
-;proxy = socks5://127.0.0.1:7890
+; proxy = socks5://127.0.0.1:10808
 ;   vpn may cause ssl issues
  sslVerify = false
 

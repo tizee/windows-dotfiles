@@ -5,9 +5,13 @@ Add-EnvironmentVariable -VariableName "HF_HOME" -VariableValue "E:\HuggingfaceCa
 Add-EnvironmentVariable -VariableName "HF_ENDPOINT" -VariableValue "https://huggingface.co" -Scope "User"
 Add-EnvironmentVariable -VariableName "TORCH_HOME" -VariableValue "E:\TorchHome" -Scope "User"
 $env:HF_HOME="E:\HuggingfaceCache"
+$env:HF_HUB="E:\HuggingfaceCache\hub"
 # mirror https://hf-mirror.com
 # official https://huggingface.co
 $env:HF_ENDPOINT="https://huggingface.co"
+function HFMirror {
+  $env:HF_ENDPOINT="https://hf-mirror.com"
+}
 
 # pytorch
 $env:TORCH_HOME="E:\TorchHome"
@@ -35,12 +39,15 @@ function Generate-WhisperSubtitles {
 }
 
 # Generate lyrics/subtitles using WhisperX
+# version 3.3.1
 function Generate-WhisperXSubtitles {
     param (
-        [Parameter(Mandatory=$true, HelpMessage="The language of audio file(en, fr, de, es, it, ja, zh, nl, uk, pt)")]
-        [string]$Language,
+        [ValidateSet("en", "fr", "de", "es", "it", "ja", "zh", "nl", "uk", "pt")]
+        [string]$Language="en",
         [string]$InputFile,
-        [string]$OutputDirectory
+        [string]$OutputDirectory,
+        [ValidateSet("tiny.en", "tiny", "base.en", "base", "small.en", "small", "medium.en", "medium", "large-v1", "large-v2", "large-v3", "large", "distil-large-v2", "distil-medium.en", "distil-small.en", "distil-large-v3", "large-v3-turbo", "turbo")]
+        [string]$model="distil-large-v3"
     )
 
     $absolutePath = Resolve-Path -Path $InputFile -ErrorAction SilentlyContinue
@@ -50,7 +57,8 @@ function Generate-WhisperXSubtitles {
         Write-Host "WAV file: $InputFile"
         Write-Host "Output directory: $OutputDirectory"
         conda activate whisperx
-        whisperx --language $Language --output_format srt --output_dir $OutputDirectory --compute_type float32 --highlight_words True --model large-v3 --model_dir $env:HF_HOME --chunk_size 4 --device cuda $InputFile
+        # $model = "deepdml/faster-whisper-large-v3-turbo-ct2"
+        whisperx --language $Language --output_format srt --output_dir $OutputDirectory --compute_type float32 --highlight_words True --model $model  --model_dir $env:HF_HUB --chunk_size 4 --device cuda $InputFile --print_progress True
     }
     else {
         Write-Error "Invalid file path: $InputFile"
@@ -78,3 +86,21 @@ function ConvertTo-WhisperWav {
         return
     }
 }
+
+function Generate-SubtitlesFromVideo {
+    param (
+        [ValidateSet("en", "fr", "de", "es", "it", "ja", "zh", "nl", "uk", "pt")]
+        [string]$Language = "en",
+        [string]$InputFile,
+        [string]$OutputDirectory
+    )
+
+    # Step 1: Convert the video file to a WAV file
+    $wavOutputFile = Join-Path -Path $OutputDirectory -ChildPath "audio"
+    ConvertTo-WhisperWav -InputFile $InputFile -OutputFile $wavOutputFile
+
+    # Step 2: Generate subtitles using WhisperX
+    $wavFilePath = "$wavOutputFile.wav"
+    Generate-WhisperXSubtitles -Language $Language -InputFile $wavFilePath -OutputDirectory $OutputDirectory
+}
+
