@@ -2,7 +2,7 @@ function ExtractVideoAudio {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
-        [string]$file
+        [string]$file,
         [Parameter(Mandatory, HelpMessage = "Path to the output audio file.")]
         [string]$output
         )
