@@ -1,9 +1,9 @@
 {
   "root_path": "F:\\Development\\scoop",
   "global_path": "F:\\Development\\scoop",
-  "last_update": "2025-02-07T16:35:50.7088765+08:00",
+  "last_update": "2025-02-12T21:06:30.6218557+08:00",
   "scoop_branch": "master",
-  "proxy": "localhost:7890",
+  "proxy": "localhost:10808",
   "architecture": "64bit",
   "scoop_repo": "https://github.com/ScoopInstaller/Scoop.git",
   "aria2-warning-enabled": false,

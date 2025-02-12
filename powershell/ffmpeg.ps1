@@ -72,7 +72,7 @@ function Ffmpeg-SearchEncoder {
         [Parameter(Mandatory, HelpMessage = "Path to the input video file.")]
         [string]$encoder,
         [Parameter(HelpMessage = "search audio encoder")]
-        [bool]$audio=$false
+        [switch]$audio
         )
     if($audio)
     {

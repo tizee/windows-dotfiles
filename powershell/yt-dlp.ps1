@@ -23,6 +23,7 @@ function Download-Ytb {
   #>
   param (
     [string]$VideoUrl,  # The URL of the YouTube video or playlist
+    [string]$browser="firefox",   # make use of brower cookies
     [switch]$Playlist   # Flag to indicate if the URL is a playlist
   )
 
@@ -32,10 +33,9 @@ function Download-Ytb {
     $playlist_arg = if ($Playlist) { "--yes-playlist" } else { "" }
 
     # Construct the yt-dlp command
-    $yt_dlp_command = "yt-dlp --no-mtime $playlist_arg --audio-format best --format `"bestvideo[height=1080]+bestaudio/best[height<=1080]/best`" --merge-output-format mp4 $VideoUrl"
+    $command = "yt-dlp --no-mtime $playlist_arg --audio-format best --format `'bestvideo[height=1080]+bestaudio/best[height<=1080]/best'` --merge-output-format mp4 $VideoUrl --cookies-from-browser $browser"
 
-    # Execute the yt-dlp command
-    Invoke-Expression $yt_dlp_command
+    Invoke-Expression $command
   } else {
     # Display an error message if yt-dlp is not installed
     Write-Error "yt-dlp is not installed. Please install it before using this function."

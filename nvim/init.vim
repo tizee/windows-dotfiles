@@ -149,9 +149,9 @@ set nobackup
 set nowritebackup
 set noundofile
 if has('nvim')
-  set shada="NONE"
- else
-  set viminfo="NONE"
+  " command line history
+  set shada='1000,<100,s1024,h
+  set shadafile=~/.config/nvim/shada/main.shada
 endif
 
 " disable swap file

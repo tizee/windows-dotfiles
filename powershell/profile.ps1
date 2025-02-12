@@ -11,36 +11,6 @@ $env:Path += ";E:\AI-models\whisper;"
 $env:MyProfile="$Home\.config\powershell\profile.ps1"
 $env:EDITOR="nvim"
 
-# scoop proxy
-# $env:HTTPS_PROXY="http://127.0.0.1:7890"
-# $env:HTTP_PROXY="http://127.0.0.1:7890"
-
-# type is the equivalent cat in powershell
-Set-Alias -Name "cat" -Value "type"
-Set-Alias -Name "trash" -Value "Remove-ItemSafely"
-Set-Alias -Name "rm" -Value "Remove-ItemSafely"
-
-# alias for dotfiles
-function dotconf {
-  cd $env:USERPROFILE\.config
-}
-
-# alias for Obsidian notes
-function notes {
-  cd f:\notes
-}
-
-Set-Alias -Name "vim" -Value "nvim"
-Set-Alias -Name "vi" -Value "nvim"
-function view ($file){
-  if (-not (Get-Command nvim -ErrorAction SilentlyContinue)) { 
-    Write-Error "nvim not installed" -ErrorAction Stop
-      return
-  }
-  nvim -R $file
-}
-Set-Alias -Name "open" -Value "Invoke-Item"
-
 # Keybinds for the PSReadline module
 $PSReadLineOptions = @{
   EditMode = "Emacs"
@@ -151,9 +121,9 @@ Add-EnvironmentVariable -VariableName "ChocolateyInstall" -VariableValue "E:\cho
 # plugins
 # Define the base directory for plugins
 $pluginBaseDir = "$env:USERPROFILE\.config\powershell"
-
 # List of plugin scripts to load
 $plugins = @(
+    "alias.ps1",
     "llm.ps1",
     "yogit.ps1",
     "whisper.ps1",

@@ -55,7 +55,7 @@ function Generate-WhisperXSubtitles {
     if ($absolutePath) {
         $InputFile = $absolutePath.Path
         $OutputDirectory = Join-Path -Path (Get-Location) -ChildPath $OutputDirectory
-        Write-Host "WAV file: $InputFile"
+        Write-Host "Input wav file: $InputFile"
         Write-Host "Output directory: $OutputDirectory"
         conda activate whisperx
         # $model = "deepdml/faster-whisper-large-v3-turbo-ct2"
@@ -63,6 +63,7 @@ function Generate-WhisperXSubtitles {
     }
     else {
         Write-Error "Invalid file path: $InputFile"
+        Write-Error "Invalid file path: $absolutePath"
         return
     }
 }
@@ -77,10 +78,9 @@ function Extract-WhisperWav {
     $absolutePath = Resolve-Path -Path $InputFile -ErrorAction SilentlyContinue
     if ($absolutePath) {
         $InputFile = $absolutePath.Path
-        $OutputFile = Join-Path -Path (Get-Location) -ChildPath $OutputFile
         Write-Host "Input file: $InputFile"
+        ffmpeg -hide_banner -hwaccel cuda -i $InputFile -acodec pcm_s16le -ac 1 -ar 16000 -af aresample=async=1 "$OutputFile.wav"
         Write-Host "WAV file: $OutputFile.wav"
-        ffmpeg -hwaccel cuda -i $InputFile -acodec pcm_s16le -ac 1 -ar 16000 -af aresample=async=1 "$OutputFile.wav"
     }
     else {
         Write-Error "Invalid file path: $InputFile"
@@ -92,16 +92,34 @@ function Generate-SubtitlesFromVideo {
     param (
         [ValidateSet("en", "fr", "de", "es", "it", "ja", "zh", "nl", "uk", "pt")]
         [string]$Language = "en",
+        [Parameter(Mandatory=$true)]
         [string]$InputFile,
+        [Parameter(Mandatory=$true)]
         [string]$OutputDirectory
     )
 
-    # Step 1: Convert the video file to a WAV file
-    $wavOutputFile = Join-Path -Path $OutputDirectory -ChildPath "$InputFile"
-    Extract-WhisperWav $InputFile -OutputFile $wavOutputFile
+    if (-not (Test-Path -Path $InputFile)) {
+        Write-Error "Input file does not exist: $InputFile"
+        return
+    }
+    if (-not (Test-Path -Path $OutputDirectory)) {
+        Write-Error "Output directory does not exist: $OutputDirectory"
+        return
+    }
 
-    # Step 2: Generate subtitles using WhisperX
-    $wavFilePath = "$wavOutputFile.wav"
-    Generate-WhisperXSubtitles -Language $Language -InputFile $wavFilePath -OutputDirectory $OutputDirectory
+    try {
+        Extract-WhisperWav -InputFile $InputFile -OutputFile "__output__"
+    } catch {
+        Write-Error "Failed to extract WAV file: $_"
+        return
+    }
+
+    try {
+        Generate-WhisperXSubtitles -Language $Language -InputFile "__output__.wav" -OutputDirectory $OutputDirectory
+        Write-Host "Subtitles generated successfully and saved to: $OutputDirectory"
+    } catch {
+        Write-Error "Failed to generate subtitles: $_"
+        return
+    }
+
 }
-
