@@ -6,7 +6,7 @@ call plug#begin('~/.vim/plugged')
 " On-demand loading: loaded when the specified command is executed
 Plug 'preservim/nerdtree', { 'on': 'NERDTreeToggle' }
 " Unmanaged plugin (manually installed and updated)
-Plug '~/projects/llm.vim'
+Plug 'D:\projects\llm.vim'
 Plug 'luochen1990/rainbow'
 
 call plug#end()

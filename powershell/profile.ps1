@@ -166,6 +166,7 @@ $plugins = @(
     "uv.ps1",
     "yt-dlp.ps1",
     "pip.ps1",
+    "golang.ps1",
     "functions.ps1"
     )
 

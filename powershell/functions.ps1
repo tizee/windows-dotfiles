@@ -3,6 +3,36 @@ function psreload() {
  . $profile
 }
 
+function Toggle-Proxy {
+    param(
+        [Parameter(Mandatory)]
+        [string]$port = "7890"
+    )
+
+    # Define the proxy URLs with the specified port
+    $socksProxy = "socks5://127.0.0.1:$port"
+    $httpProxy = "http://127.0.0.1:$port"
+    $httpsProxy = "http://127.0.0.1:$port"
+
+    # Check if the proxy is currently set
+    if ($env:ALL_PROXY -eq $socksProxy -and $env:HTTP_PROXY -eq $httpProxy -and $env:HTTPS_PROXY -eq $httpsProxy) {
+        # If the proxy is set, unset it
+        Remove-Item Env:\ALL_PROXY
+        Remove-Item Env:\HTTP_PROXY
+        Remove-Item Env:\HTTPS_PROXY
+        Write-Host "Proxy settings have been disabled."
+    } else {
+        # If the proxy is not set, enable it
+        $env:ALL_PROXY = $socksProxy
+        $env:HTTP_PROXY = $httpProxy
+        $env:HTTPS_PROXY = $httpsProxy
+        Write-Host "Proxy settings have been enabled."
+        Write-Host "ALL_PROXY: $env:ALL_PROXY"
+        Write-Host "HTTP_PROXY: $env:HTTP_PROXY"
+        Write-Host "HTTPS_PROXY: $env:HTTPS_PROXY"
+    }
+}
+
 # Safer link creation with validation
 function make-link {
     param(
