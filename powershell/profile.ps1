@@ -1,11 +1,38 @@
 # use . $profile to reload powershell configuration
+function UpdatePath {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$NewPath,
 
-# Consider using a conditional check before adding paths
-if ($env:Path -notmatch ([regex]::Escape("$env:USERPROFILE\.local\bin"))) {
-  $env:Path += ";$env:USERPROFILE\.local\bin"
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Process', 'User', 'Machine')]
+        [string]$Scope = 'Process',
+        [switch]$Silence
+    )
+
+    # Get the current PATH value based on the specified scope
+    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', $Scope)
+
+    # Escape the NewPath to handle special characters in regex
+    $escapedPath = [regex]::Escape($NewPath)
+
+    # Check if the new path already exists in the PATH
+    if ($currentPath -notmatch $escapedPath) {
+        # Append the new path to the current PATH
+        $updatedPath = "$currentPath;$NewPath"
+        [System.Environment]::SetEnvironmentVariable('PATH', $updatedPath, $Scope)
+        if(!$Silence){
+            Write-Host "Path '$NewPath' added successfully to the $Scope scope."
+          }
+    } else {
+        if(!$Silence) {
+            Write-Host "Path '$NewPath' already exists in the $Scope scope PATH."
+        }
+    }
 }
-# whisper
-$env:Path += ";E:\AI-models\whisper;"
+
+UpdatePath "$env:USERPROFILE\.local\bin"
+UpdatePath "E:\AI-models\whisper"
 
 # profile
 $env:MyProfile="$Home\.config\powershell\profile.ps1"
@@ -137,6 +164,7 @@ $plugins = @(
     "yt-dlp.ps1",
     "pip.ps1",
     "golang.ps1",
+    "yarn.ps1",
     "functions.ps1"
     )
 
