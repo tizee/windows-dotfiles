@@ -21,24 +21,32 @@ set statusline=%<%F\ %y\ [%{&fileencoding?&fileencoding:&encoding}]\ \ \ %m%r%h\
 
 let g:rainbow_active = 1
 let mapleader = "\<space>"
-" Map Y to copy to system clipboard in visual and visual select mode
+
+" Map Y/<leader>y to copy to system clipboard in visual and visual select mode
+vnoremap Y "+y
 vnoremap Y "+y
 xnoremap Y "+y
 vnoremap <leader>y "+y
 xnoremap <leader>y "+y
+" Map P/<leader>p to copy to system clipboard in visual and visual select mode
+vnoremap P "+p
+vnoremap P "+p
+xnoremap P "+p
+vnoremap <leader>p "+p
+xnoremap <leader>p "+p
 
 let g:clipboard = {
-            \   'name': 'WslClipboard',
-            \   'copy': {
-            \      '+': 'clip.exe',
-            \      '*': 'clip.exe',
-            \    },
-            \   'paste': {
-            \      '+': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-            \      '*': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-            \   },
-            \   'cache_enabled': 0,
-            \ }
+  \   'name': 'win32yank',
+  \   'copy': {
+  \      '+': 'win32yank.exe -i --crlf',
+  \      '*': 'win32yank.exe -i --crlf',
+  \   },
+  \   'paste': {
+  \      '+': 'win32yank.exe -o --lf',
+  \      '*': 'win32yank.exe -o --lf',
+  \   },
+  \   'cache_enabled': 0,
+  \ }
 
 set list
 set listchars=eol:⏎,tab:»-,trail:-,nbsp:.
