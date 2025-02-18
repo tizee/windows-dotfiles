@@ -165,6 +165,7 @@ $plugins = @(
     "pip.ps1",
     "golang.ps1",
     "yarn.ps1",
+    "msvc.ps1",
     "functions.ps1"
     )
 
