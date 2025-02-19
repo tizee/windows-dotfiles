@@ -167,6 +167,7 @@ $plugins = @(
     "yarn.ps1",
     "msvc.ps1",
     "bluetooth.ps1",
+    "z.ps1",
     "functions.ps1"
     )
 
