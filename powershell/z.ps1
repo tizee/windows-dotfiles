@@ -4,7 +4,7 @@ function z {
         [string[]]$Args
     )
     # Update this path to the location of your zpy executable
-    $zScript = "zpy.exe"
+    $zScript = "E:\Miniconda3\Scripts\zpy.exe"
 
     if ($Args.Count -eq 0) {
         Write-Host "Usage: z [--add|--list|-l|other flags and query]" -ForegroundColor Yellow
@@ -75,7 +75,7 @@ function Set-Location {
     # Use the original Set-Location from Microsoft.PowerShell.Management to avoid recursion.
     Microsoft.PowerShell.Management\Set-Location @PSBoundParameters
     # After a successful directory change, update the history.
-    $zScript = "zpy.exe"
+    $zScript = "E:\Miniconda3\Scripts\zpy.exe"
     & $zScript --add (Get-Location) | Out-Null
 }
 
