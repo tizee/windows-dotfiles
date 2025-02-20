@@ -168,6 +168,7 @@ $plugins = @(
     "msvc.ps1",
     "bluetooth.ps1",
     "z.ps1",
+    "wtree.ps1",
     "functions.ps1"
     )
 

@@ -191,14 +191,16 @@ function Compress-Video {
         [string]$output,
 
         [ValidateSet("ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow")]
-        [string]$quality = "superfast"
+        [string]$quality = "medium"
     )
     
     try {
         $absolutePath = Resolve-Path $file -ErrorAction Stop
         $file = $absolutePath.Path
         Write-Host "Processing file: $file"
-        ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -tag:v avc1 -c:v h264_nvenc -movflags +faststart -preset $quality -crf 30 -c:a copy $output
+        $command = "ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i $file -tag:v avc1 -c:v h264_nvenc -movflags +faststart -preset $quality -crf 30 -c:a copy $output"
+        Write-Host "command: $command"
+        Invoke-Expression $command
         Write-Host "Output file: $output"
     } catch {
         Write-Error "Invalid file path: $file"
