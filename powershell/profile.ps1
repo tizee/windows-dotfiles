@@ -164,7 +164,7 @@ $plugins = @(
     "yt-dlp.ps1",
     "pip.ps1",
     "golang.ps1",
-    "yarn.ps1",
+    "javascript.ps1",
     "msvc.ps1",
     "bluetooth.ps1",
     "z.ps1",

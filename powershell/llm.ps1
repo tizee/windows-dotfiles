@@ -1,5 +1,6 @@
 # python llm cli
 $env:LLM_USER_PATH="E:\AI-models\io.datasette.llm"
+$env:LLM_PROGRAM="E:\Miniconda3\Scripts\llm.exe"
 # $env:DEEPSEEK_API_KEY = (Get-Content $env:LLM_USER_PATH\keys.json -Raw | jq ".deepseek" -r)
 # $env:DOUBAO_API_KEY = (Get-Content $env:LLM_USER_PATH\keys.json -Raw | jq ".doubao" -r)
 
