@@ -109,34 +109,121 @@ function Reload-EnvVarUser {
 }
 
 function Find-Font {
-  param(
-    [string]$Name,
-    [string]$PartialName,
-    [switch]$CaseInsensitive,
-    [switch]$ListAll
-  )
+    param(
+        [string]$Name,
+        [string]$PartialName,
+        [switch]$CaseInsensitive,
+        [switch]$ListAll
+    )
 
-  if ($ListAll) {
-      [System.Drawing.FontFamily]::Families | ForEach-Object { $_.Name }
-      return
-  }
+    # Get font registry entries from both system and user
+    $systemFontPath = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+    $userFontPath = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+    
+    $registryEntries = @()
+    if (Test-Path $systemFontPath) {
+        $registryEntries += Get-ItemProperty $systemFontPath | 
+            ForEach-Object { 
+                $source = "System"
+                $_.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | 
+                    Select-Object @{n="Name";e={$_.Name}}, 
+                                  @{n="FileName";e={(Split-Path $_.Value -Leaf)}}, 
+                                  @{n="Source";e={$source}}
+            }
+    }
 
+    if (Test-Path $userFontPath) {
+        $registryEntries += Get-ItemProperty $userFontPath | 
+            ForEach-Object { 
+                $source = "User"
+                $_.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | 
+                    Select-Object @{n="Name";e={$_.Name}}, 
+                                  @{n="FileName";e={(Split-Path $_.Value -Leaf)}}, 
+                                  @{n="Source";e={$source}}
+            }
+    }
 
-  $fonts = [System.Drawing.FontFamily]::Families 
+    # Get all installed font families
+    $fontFamilies = [System.Drawing.FontFamily]::Families
 
-  if ($Name) {
-      if ($CaseInsensitive) {
-         $fonts = $fonts | Where-Object {$_.Name -ceq $Name}
-      } else {
-         $fonts = $fonts | Where-Object {$_.Name -eq $Name}
-      }
-  }
+    if ($ListAll) {
+        $fontFamilies | ForEach-Object {
+            $fontName = $_.Name
+            $matches = $registryEntries | Where-Object {
+                $baseName = $_.Name -replace '\s*\(.*\)', ''
+                $baseName -eq $fontName
+            }
 
-  if ($PartialName) {
-        $fonts = $fonts | Where-Object { $_.Name -like "*$PartialName*" }
-  }
+            if ($matches) {
+                $matches | ForEach-Object {
+                    $path = if ($_.Source -eq "System") {
+                        Join-Path $env:windir "Fonts\$($_.FileName)"
+                    } else {
+                        Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts\$($_.FileName)"
+                    }
+                    [PSCustomObject]@{
+                        Name = $fontName
+                        Path = $path
+                        Source = $_.Source
+                    }
+                }
+            } else {
+                [PSCustomObject]@{
+                    Name = $fontName
+                    Path = $null
+                    Source = "Unknown"
+                }
+            }
+        }
+        return
+    }
 
-  $fonts | ForEach-Object { $_.Name }
+    # Apply filters
+    $filteredFonts = $fontFamilies
+    if ($Name) {
+        $filteredFonts = $filteredFonts | Where-Object {
+            if ($CaseInsensitive) {
+                $_.Name -eq $Name
+            } else {
+                $_.Name -ceq $Name
+            }
+        }
+    }
+
+    if ($PartialName) {
+        $wildcard = "*$PartialName*"
+        $filteredFonts = $filteredFonts | Where-Object { $_.Name -like $wildcard }
+    }
+
+    # Output results with corrected paths
+    $filteredFonts | ForEach-Object {
+        $fontName = $_.Name
+        $matches = $registryEntries | Where-Object {
+            $baseName = $_.Name -replace '\s*\(.*\)', ''
+            $baseName -eq $fontName
+        }
+
+        if ($matches) {
+            $matches | ForEach-Object {
+                $path = if ($_.Source -eq "System") {
+                    Join-Path $env:windir "Fonts\$($_.FileName)"
+                } else {
+                    Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts\$($_.FileName)"
+                }
+                [PSCustomObject]@{
+                    Name = $fontName
+                    Path = $path
+                    Source = $_.Source
+                }
+            }
+        } else {
+            [PSCustomObject]@{
+                Name = $fontName
+                Path = $null
+                Source = "Unknown"
+            }
+        }
+    }
 }
 
 function Get-MachineId {
