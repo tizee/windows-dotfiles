@@ -50,6 +50,40 @@ $PSReadLineOptions = @{
       "Command" = "#8181f7"
     }
 }
+
+# 增加历史记录的大小限制
+Set-PSReadLineOption -MaximumHistoryCount 20000
+# 确保历史记录被保存
+Set-PSReadLineOption -HistorySaveStyle SaveIncrementally
+# (Get-PSReadLineOption).HistorySavePath
+
+function Invoke-FzfHistory {
+  # 获取历史文件路径
+  $historyFilePath = (Get-PSReadLineOption).HistorySavePath
+  
+  # 如果历史文件存在，则从文件中读取历史记录
+  if (Test-Path $historyFilePath) {
+    $fileHistory = Get-Content $historyFilePath
+    # 获取当前会话的历史记录
+    $sessionHistory = Get-History | Select-Object -ExpandProperty CommandLine
+    
+    # 合并两种历史记录并去重
+    $allHistory = $sessionHistory + $fileHistory | Select-Object -Unique
+  } else {
+    # 如果历史文件不存在，则只使用当前会话的历史记录
+    $allHistory = Get-History | Select-Object -ExpandProperty CommandLine
+  }
+  
+  # 使用fzf选择命令
+  $selection = $allHistory | fzf --reverse --height 40%
+  if ($selection) {
+    [Microsoft.PowerShell.PSConsoleReadLine]::ReplaceLine($selection)
+    [Microsoft.PowerShell.PSConsoleReadLine]::EndOfLine()
+  }
+}
+Set-Alias -Name fh -Value Invoke-FzfHistory
+
+
 Set-PSReadLineOption @PSReadLineOptions
 
 Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
@@ -140,8 +174,6 @@ function Add-EnvironmentVariable {
     Write-Host "Environment variable '$VariableName' has been set to '$VariableValue' for the '$Scope' scope."
 }
 
-# pnpm
-Add-EnvironmentVariable -VariableName "PNPM_HOME" -VariableValue "E:\pnpm" -Scope "User"
 # chocolatey
 Add-EnvironmentVariable -VariableName "ChocolateyInstall" -VariableValue "E:\chocolatey" -Scope "User"
 
